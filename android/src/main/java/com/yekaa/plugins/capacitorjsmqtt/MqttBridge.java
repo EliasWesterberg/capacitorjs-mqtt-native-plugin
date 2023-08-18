@@ -7,7 +7,9 @@ import com.getcapacitor.PluginCall;
 import com.yekaa.plugins.capacitorjsmqtt.Constants;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import org.eclipse.paho.android.service.MqttAndroidClient;
+// import org.eclipse.paho.android.service.MqttAndroidClient;
+import info.mqtt.android.service.Ack;
+import info.mqtt.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
@@ -134,11 +136,11 @@ public class MqttBridge implements MqttCallbackExtended {
             // Set isConnecting to true to avoid multiple connect requests
             isConnecting = true;
             // Create the MqttAndroidClient object
-            mqttClient = new MqttAndroidClient(context, fullURI, clientId);
+            mqttClient = new MqttAndroidClient(context, serverURI, clientId, Ack.AUTO_ACK);
             // Set this as the callback for the MQTT client
             mqttClient.setCallback(this);
 
-            try {
+//            try {
                 // Attempt to connect to the MQTT broker using the provided options
                 mqttClient.connect(
                     mqttConnectOptions,
@@ -165,22 +167,22 @@ public class MqttBridge implements MqttCallbackExtended {
                         }
                     }
                 );
-            } catch (MqttException e) {
-                e.printStackTrace();
-            }
+//            } catch (MqttException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 
     public void disconnect(final PluginCall call) {
         if (mqttClient.isConnected()) {
-            try {
+//            try {
                 mqttClient.disconnect();
 
                 call.resolve();
-            } catch (MqttException e) {
-                call.reject("Disconnect Failed: " + e);
-                e.printStackTrace();
-            }
+//            } catch (MqttException e) {
+//                call.reject("Disconnect Failed: " + e);
+//                e.printStackTrace();
+//            }
         }
     }
 
@@ -195,7 +197,7 @@ public class MqttBridge implements MqttCallbackExtended {
         final String topic = call.getString("topic");
         final int qos = call.getInt("qos", 0);
 
-        try {
+//        try {
             // Subscribe to the MQTT topic with the given qos
             mqttClient.subscribe(
                 topic,
@@ -222,10 +224,10 @@ public class MqttBridge implements MqttCallbackExtended {
                     }
                 }
             );
-        } catch (MqttException ex) {
+//        } catch (MqttException ex) {
             // Reject the plugin call with an error message
-            call.reject("Failed to subscribe to topic: " + topic);
-        }
+//            call.reject("Failed to subscribe to topic: " + topic);
+//        }
     }
 
     public void publish(final PluginCall call) {
@@ -241,7 +243,7 @@ public class MqttBridge implements MqttCallbackExtended {
         final boolean retained = call.getBoolean("retained", false);
         final String payload = call.getString("payload");
 
-        try {
+//        try {
             // Create an MqttMessage object with the payload
             MqttMessage message = new MqttMessage(payload.getBytes(StandardCharsets.UTF_8));
             // Set the qos and retained flag of the message
@@ -274,10 +276,10 @@ public class MqttBridge implements MqttCallbackExtended {
                     }
                 }
             );
-        } catch (MqttException ex) {
+//        } catch (MqttException ex) {
             // Reject the PluginCall with an error message
-            call.reject("Failed to publish message to topic: " + topic);
-        }
+//            call.reject("Failed to publish message to topic: " + topic);
+//        }
     }
 
     @Override
